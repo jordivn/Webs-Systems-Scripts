@@ -1,0 +1,11 @@
+#!/bin/sh
+
+curl -s -c cookie.txt -b cookie.txt -o temp.txt https://quotevandedag.com
+wait
+curl -s -c cookie.txt -b cookie.txt -o temp.txt https://quotevandedag.com/quotes?date=2023-06-25&timezone=Europe%2FAmsterdam
+wait
+cat temp.txt | jq -r .[0].quote > quote.txt
+rm -f cookie.txt temp.txt
+mosquitto_pub -r -h localhost -t "daily_quote" -q 2 -s < ./quote.txt
+
+exit 1
