@@ -34,7 +34,7 @@ for DOMAIN in $(ls -d /home/$USER/imap/*); do
     for FOLDER in "${SPAM_FOLDERS[@]}"; do
       if [ -d "$MAILBOX/Maildir/$FOLDER" ]; then
         echo "Leren van spam uit $MAILBOX/Maildir/$FOLDER" >> $LOGPATH$USER.log
-        rspamc learn_spam "$MAILBOX/Maildir/$FOLDER" >> >> $LOGPATH$USER.log
+        rspamc learn_spam "$MAILBOX/Maildir/$FOLDER" >> $LOGPATH$USER.log
       fi
     done
 
