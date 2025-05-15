@@ -45,6 +45,22 @@ elif [[ "$ISSUER" == *"DigiCert"* ]]; then
     CA="digicert.com"
 elif [[ "$ISSUER" == *"Google Trust Services"* || "$ISSUER" == *"R10"* ]]; then
     CA="pki.goog"
+elif [[ "$ISSUER" == *"GlobalSign"* ]]; then
+    CA="globalsign.com"
+elif [[ "$ISSUER" == *"Buypass"* ]]; then
+    CA="buypass.com"
+elif [[ "$ISSUER" == *"Amazon"* || "$ISSUER" == *"AWS"* ]]; then
+    CA="amazon.com"
+elif [[ "$ISSUER" == *"SSL.com"* ]]; then
+    CA="ssl.com"
+elif [[ "$ISSUER" == *"Entrust"* ]]; then
+    CA="entrust.net"
+elif [[ "$ISSUER" == *"Actalis"* ]]; then
+    CA="actalis.com"
+elif [[ "$ISSUER" == *"GoDaddy"* ]]; then
+    CA="godaddy.com"
+elif [[ "$ISSUER" == *"Certum"* ]]; then
+    CA="certum.pl"
 else
     echo "Onbekende issuer: $ISSUER"
     exit 1
