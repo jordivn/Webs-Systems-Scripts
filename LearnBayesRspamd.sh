@@ -6,8 +6,8 @@
 #Version: 3.0
 #Description: Script for learning user-based bayes with mailbox folders other than default (ham) and known spam folders
 
-export LC_ALL=en_US.UTF-8
-export LANG=en_US.UTF-8
+export LC_ALL=C.utf8
+export LANG=C.utf8
 
 LOGPATH='/var/log/sa-learn/'
 SPAMDETAILS_LOG="/var/log/sa-learn/spamdetails.log"
