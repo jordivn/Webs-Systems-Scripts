@@ -12,7 +12,7 @@ export LANG=C.utf8
 LOGPATH='/var/log/sa-learn/'
 SPAMDETAILS_LOG="/var/log/sa-learn/spamdetails.log"
 mkdir -p "$LOGPATH"
-
+printf "Starting with learning" >> /var/log/sa-learn/overall.log
 # Definieer spam-mappen
 SPAM_FOLDERS=(".Ongewenste e-mail" ".spam" ".Spam" ".Unwanted" ".Junk" ".Junk E-mail" ".Courrier indésirable" ".Unerwünschte E-Mails" ".Correo no deseado" ".Posta indesiderata" ".Junkmail" ".Spamfolder" ".Unwanted" ".Blocked" ".Blacklisted" ".BULK" ".INBOX.Spam" ".INBOX.spam")
 # Definieer uitzonderingen
@@ -33,15 +33,27 @@ for USER in $(ls /usr/local/directadmin/data/users); do
                     rspamc learn_spam "$MAILBOX/Maildir/$FOLDER" >> "$LOGPATH$USER.log"
 
                     find "$MAILBOX/Maildir/$FOLDER" -type f ! -name "dovecot.index*" ! -name "subscriptions" ! -name "maildirsize" ! -name "*~" | while read -r MAILFILE; do
-                        FROM=$(grep -m1 "^From:" "$MAILFILE" | sed 's/^From:[[:space:]]*//')
-                        SUBJECT=$(grep -m1 "^Subject:" "$MAILFILE" | sed 's/^Subject:[[:space:]]*//')
-                        IP=$(grep -m1 "Received: from" "$MAILFILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
-                        SERVER=$(grep -m1 "Received: from" "$MAILFILE" | sed -E 's/.*from ([^ ]+).*/\1/')
+                      FROM=$(grep -m1 "^From:" "$MAILFILE" | sed 's/^From:[[:space:]]*//')
 
-                        if [ -n "$FROM" ] || [ -n "$SUBJECT" ] || [ -n "$IP" ] || [ -n "$SERVER" ]; then
-                            printf "%s\t%s\t%s\t%s\n" "$FROM" "$SERVER" "$IP" "$SUBJECT" >> "$SPAMDETAILS_LOG"
-                        fi
-                    done
+                      # Subject schoonmaken met pure bash
+                      SUBJECT=$(grep -m1 "^Subject:" "$MAILFILE" | sed 's/^Subject:[[:space:]]*//')
+                      # Decode =?utf-8?Q? en =?utf-8?B? encoded subjects
+                      if command -v recode >/dev/null 2>&1; then
+                          SUBJECT=$(echo "$SUBJECT" | recode UTF-8..)
+                      elif command -v iconv >/dev/null 2>&1; then
+                          SUBJECT=$(echo "$SUBJECT" | iconv -f UTF-8 -t UTF-8)
+                      fi
+
+                      IP=$(grep -m1 "Received: from" "$MAILFILE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+')
+                      SERVER=$(grep -m1 "Received: from" "$MAILFILE" | sed -E 's/.*from ([^ ]+).*/\1/')
+
+                      # Alleen loggen als er waardes zijn
+                      if [ -n "$FROM" ] || [ -n "$SUBJECT" ] || [ -n "$IP" ] || [ -n "$SERVER" ]; then
+                          echo -e "$FROM;$SERVER;$IP;$SUBJECT" >> "$SPAMDETAILS_LOG"
+                      fi
+                  done
+
+
                 fi
             done
 
